@@ -9,12 +9,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=ses1">
+  <meta name="theme-color" content="#0c1b22">
+  <link rel="stylesheet" href="css/research.css?v=dark-research1">
 </head>
 <body>
 
-  <!-- ===== 粒子背景 ===== -->
-  <canvas id="particleCanvas"></canvas>
+  <a class="skip-link" href="#hero"><span data-zh>跳至正文</span><span data-en>Skip to content</span></a>
 
   <!-- ===== 导航栏 ===== -->
   <nav class="navbar" id="navbar">
@@ -24,8 +24,8 @@
         <span data-en>Qi Liu</span>
       </a>
       <ul class="nav-menu" id="navMenu">
-        <li><a href="#news" class="nav-link">
-          <span data-zh>新闻动态</span><span data-en>News</span>
+        <li><a href="#selected" class="nav-link">
+          <span data-zh>精选研究</span><span data-en>Selected Work</span>
         </a></li>
         <li><a href="#research" class="nav-link">
           <span data-zh>研究方向</span><span data-en>Research</span>
@@ -36,11 +36,8 @@
         <li><a href="#education" class="nav-link">
           <span data-zh>教育经历</span><span data-en>Education</span>
         </a></li>
-        <li><a href="#projects" class="nav-link">
-          <span data-zh>科研项目</span><span data-en>Projects</span>
-        </a></li>
-        <li><a href="#service" class="nav-link">
-          <span data-zh>学术服务</span><span data-en>Service</span>
+        <li><a href="#contact" class="nav-link">
+          <span data-zh>联系</span><span data-en>Contact</span>
         </a></li>
       </ul>
       <div class="nav-actions">
@@ -48,7 +45,7 @@
           <span data-zh>EN</span>
           <span data-en>中文</span>
         </button>
-        <button class="hamburger" id="hamburger" aria-label="菜单">
+        <button class="hamburger" id="hamburger" aria-label="菜单" aria-controls="navMenu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -56,22 +53,18 @@
   </nav>
 
   <!-- ===== Hero 区域 ===== -->
+  <main>
   <section class="hero" id="hero">
     <div class="container hero-content">
-      <div class="hero-avatar">
-        <div class="avatar-placeholder">
-          <div class="avatar-ring"></div>
-          <img src="images/avatar.jpg" alt="刘齐">
-        </div>
-      </div>
       <div class="hero-text">
-        <p class="hero-greeting">
-          <span data-zh>你好，我是</span>
-          <span data-en>Hi, I'm</span>
-        </p>
+        <p class="hero-greeting">GEOGRAPHY · ECOLOGY · AI</p>
+        <div class="hero-identity">
+          <img src="images/avatar.jpg" alt="刘齐 / Qi Liu" width="52" height="52">
+          <p><span data-zh>刘齐 <span class="identity-latin">/ Qi Liu</span></span><span data-en>Qi Liu <span class="identity-latin">/ 刘齐</span></span></p>
+        </div>
         <h1>
-          <span data-zh>刘齐</span>
-          <span data-en>Qi Liu</span>
+          <span data-zh>理解人地系统，<br>探索<span class="hero-emphasis">可持续未来。</span></span>
+          <span data-en>Understanding<br>people and nature.<br><span class="hero-emphasis">Towards sustainability.</span></span>
         </h1>
         <p class="hero-title">
           <span data-zh>博士生</span>
@@ -82,16 +75,14 @@
           <span data-en>Faculty of Geographical Science, Beijing Normal University</span>
         </p>
         <p class="hero-bio">
-          <span data-zh>专注于生态系统服务、可持续发展、社会-生态系统和 AI for Science 等领域的研究。</span>
-          <span data-en>Focused on Ecosystem Services, Sustainable Development, Social-Ecological Systems, and AI for Science.</span>
+          <span data-zh>关注生态系统服务与社会—生态系统，探索人工智能在地理科学中的应用。</span>
+          <span data-en>Studying ecosystem services and social–ecological systems, and exploring AI applications in geographical science.</span>
         </p>
-        <div class="hero-tags">
-          <span class="tag">Ecosystem Services</span>
-          <span class="tag">Sustainability</span>
-          <span class="tag">Social-Ecological Systems</span>
-          <span class="tag">AI for Science</span>
+        <div class="hero-actions">
+          <a class="button-primary" href="#selected"><span data-zh>探索研究成果</span><span data-en>Explore research</span><span aria-hidden="true">↗</span></a>
+          <a class="button-text" href="mailto:upwardliuqi@163.com"><span data-zh>联系我</span><span data-en>Get in touch</span><span aria-hidden="true">↗</span></a>
         </div>
-        <div class="hero-links">
+        <div class="hero-links" hidden>
           <a href="mailto:upwardliuqi@163.com" class="social-link" title="Email">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
           </a>
@@ -109,14 +100,53 @@
           </a>
         </div>
       </div>
-      <div class="hero-visual" aria-hidden="true">
-        <canvas id="sesCanvas"></canvas>
+      <figure class="hero-visual">
+        <canvas id="sesCanvas" aria-hidden="true"></canvas>
+        <figcaption><span data-zh>社会—生态系统 / 概念网络</span><span data-en>SOCIAL–ECOLOGICAL SYSTEMS / CONCEPTUAL NETWORK</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="research-strip"><div class="container">
+    <span>01 / ECOSYSTEM SERVICES</span><span>02 / SUSTAINABILITY</span><span>03 / SOCIAL–ECOLOGICAL SYSTEMS</span><span>04 / AI FOR SCIENCE</span>
+  </div></div>
+
+  <section class="section selected-section" id="selected">
+    <div class="container">
+      <p class="section-eyebrow">SELECTED WORK</p>
+      <div class="section-heading"><h2 class="section-title"><span data-zh>精选研究</span><span data-en>Selected research</span></h2><a class="section-more" href="#publications"><span data-zh>全部论文</span><span data-en>All publications</span> <span aria-hidden="true">↗</span></a></div>
+      <div class="selected-grid">
+        <article class="selected-card">
+          <div class="selected-art" data-art="vegetation" aria-hidden="true"><svg viewBox="0 0 320 150"></svg></div>
+          <p class="selected-meta"><span>2027</span><span>01 / RESEARCH</span></p>
+          <h3><a href="https://doi.org/10.1016/j.eiar.2026.108727" target="_blank" rel="noopener"><span data-zh>城市植被与资源配置</span><span data-en>Urban vegetation &amp; resource allocation</span> <span aria-hidden="true">↗</span></a></h3>
+          <p class="selected-venue">Environmental Impact Assessment Review</p>
+          <p class="selected-description"><span data-zh>利用 DSTFormer–SHAP 分析中国 19 个城市群的植被生长抵消与资源配置策略。</span><span data-en>Examining vegetation growth offset and resource allocation across 19 urban agglomerations in China with DSTFormer–SHAP.</span></p>
+          <div class="pub-links"><a class="pub-link" href="papers/liu-2027-urban-vegetation-growth-offset.pdf" target="_blank" rel="noopener">PDF ↗</a><a class="pub-link" href="https://doi.org/10.1016/j.eiar.2026.108727" target="_blank" rel="noopener">DOI ↗</a></div>
+        </article>
+        <article class="selected-card">
+          <div class="selected-art" data-art="network" aria-hidden="true"><svg viewBox="0 0 320 150"></svg></div>
+          <p class="selected-meta"><span>2026</span><span>02 / RESEARCH</span></p>
+          <h3><a href="https://doi.org/10.1002/ldr.70834" target="_blank" rel="noopener"><span data-zh>县域人地协调</span><span data-en>Human–nature coordination</span> <span aria-hidden="true">↗</span></a></h3>
+          <p class="selected-venue">Land Degradation &amp; Development</p>
+          <p class="selected-description"><span data-zh>结合可解释时空图神经网络与双重差分，评估和解释中国县域人地协调。</span><span data-en>Assessing county-scale human–nature coordination in China with interpretable spatiotemporal graph learning and difference-in-differences.</span></p>
+          <div class="pub-links"><a class="pub-link" href="papers/liu-2026-human-nature-coordination-county-scale.pdf" target="_blank" rel="noopener">PDF ↗</a><a class="pub-link" href="https://doi.org/10.1002/ldr.70834" target="_blank" rel="noopener">DOI ↗</a></div>
+        </article>
+        <article class="selected-card">
+          <div class="selected-art" data-art="ecosystem" aria-hidden="true"><svg viewBox="0 0 320 150"></svg></div>
+          <p class="selected-meta"><span>2023</span><span>03 / RESEARCH</span></p>
+          <h3><a href="https://doi.org/10.1016/j.scitotenv.2023.168486" target="_blank" rel="noopener"><span data-zh>生态系统服务交互</span><span data-en>Ecosystem service interactions</span> <span aria-hidden="true">↗</span></a></h3>
+          <p class="selected-venue">Science of The Total Environment</p>
+          <p class="selected-description"><span data-zh>研究黄河流域不同空间尺度下生态系统服务交互的时空异质性及驱动因素。</span><span data-en>Exploring multiscale spatiotemporal heterogeneity and drivers of ecosystem service interactions in the Yellow River basin.</span></p>
+          <div class="pub-links"><a class="pub-link" href="papers/liu-2023-ecosystem-service-yellow-river.pdf" target="_blank" rel="noopener">PDF ↗</a><a class="pub-link" href="https://doi.org/10.1016/j.scitotenv.2023.168486" target="_blank" rel="noopener">DOI ↗</a></div>
+        </article>
       </div>
+      <p class="art-caption"><span data-zh>配图为研究主题的概念示意。</span><span data-en>Illustrations represent research themes, not empirical results.</span></p>
     </div>
   </section>
 
   <!-- ===== 新闻动态 ===== -->
-  <section class="section" id="news">
+  <section class="section" id="news" hidden>
     <div class="container">
       <h2 class="section-title animate-on-scroll">
         <span data-zh>新闻动态</span>
@@ -374,7 +404,7 @@
   </section>
 
   <!-- ===== 科研项目 ===== -->
-  <section class="section section-alt" id="projects">
+  <section class="section section-alt" id="projects" hidden>
     <div class="container">
       <h2 class="section-title animate-on-scroll">
         <span data-zh>科研项目</span>
@@ -393,7 +423,7 @@
   </section>
 
   <!-- ===== 学术服务 ===== -->
-  <section class="section" id="service">
+  <section class="section" id="service" hidden>
     <div class="container">
       <h2 class="section-title animate-on-scroll">
         <span data-zh>学术服务</span>
@@ -411,6 +441,7 @@
     </div>
   </section>
 
+  </main>
   <!-- ===== 页脚 ===== -->
   <footer class="footer" id="contact">
     <div class="container">
@@ -439,6 +470,6 @@
     </div>
   </footer>
 
-  <script src="js/main.js?v=ses1"></script>
+  <script src="js/main.js?v=dark-research1"></script>
 </body>
 </html>

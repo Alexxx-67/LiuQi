@@ -7,80 +7,6 @@ const backToTop = document.getElementById('backToTop');
 const navLinks = document.querySelectorAll('.nav-link');
 const pubFilters = document.querySelectorAll('.pub-filter');
 
-// ===== Particle Background =====
-const canvas = document.getElementById('particleCanvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
-let animationId;
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-
-function createParticles() {
-  particles = [];
-  const count = Math.floor((canvas.width * canvas.height) / 18000);
-  for (let i = 0; i < count; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: Math.random() * 1.5 + 0.5,
-      opacity: Math.random() * 0.5 + 0.1,
-    });
-  }
-}
-
-function drawParticles() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  for (let i = 0; i < particles.length; i++) {
-    const p = particles[i];
-    p.x += p.vx;
-    p.y += p.vy;
-
-    if (p.x < 0) p.x = canvas.width;
-    if (p.x > canvas.width) p.x = 0;
-    if (p.y < 0) p.y = canvas.height;
-    if (p.y > canvas.height) p.y = 0;
-
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(6, 182, 212, ${p.opacity})`;
-    ctx.fill();
-
-    // Draw connections
-    for (let j = i + 1; j < particles.length; j++) {
-      const p2 = particles[j];
-      const dx = p.x - p2.x;
-      const dy = p.y - p2.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist < 120) {
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.strokeStyle = `rgba(6, 182, 212, ${0.06 * (1 - dist / 120)})`;
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-      }
-    }
-  }
-
-  animationId = requestAnimationFrame(drawParticles);
-}
-
-resizeCanvas();
-createParticles();
-drawParticles();
-
-window.addEventListener('resize', () => {
-  resizeCanvas();
-  createParticles();
-});
-
 // ===== Navbar scroll shadow =====
 window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 20);
@@ -90,17 +16,19 @@ window.addEventListener('scroll', () => {
 hamburger.addEventListener('click', () => {
   hamburger.classList.toggle('active');
   navMenu.classList.toggle('open');
+  hamburger.setAttribute('aria-expanded', navMenu.classList.contains('open'));
 });
 
 navLinks.forEach(link => {
   link.addEventListener('click', () => {
     hamburger.classList.remove('active');
     navMenu.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
   });
 });
 
 // ===== Active nav link on scroll =====
-const sections = document.querySelectorAll('section[id]');
+const sections = document.querySelectorAll('section[id]:not([hidden]), footer[id]');
 
 function updateActiveNav() {
   const scrollY = window.scrollY + 100;
@@ -123,12 +51,26 @@ function updateActiveNav() {
 }
 
 window.addEventListener('scroll', updateActiveNav);
+updateActiveNav();
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && navMenu.classList.contains('open')) {
+    navMenu.classList.remove('open');
+    hamburger.classList.remove('active');
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.focus();
+  }
+});
 
 // ===== Language Toggle =====
 function setLanguage(lang) {
+  if (lang !== 'zh' && lang !== 'en') return;
   document.documentElement.setAttribute('data-lang', lang);
-  localStorage.setItem('lang', lang);
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  try { localStorage.setItem('lang', lang); } catch { /* Browsing can continue without storage. */ }
   document.title = lang === 'zh' ? '刘齐 | 学术主页' : 'Qi Liu | Academic Homepage';
+  hamburger.setAttribute('aria-label', lang === 'zh' ? '菜单' : 'Menu');
+  document.dispatchEvent(new Event('languagechange'));
 }
 
 langToggle.addEventListener('click', () => {
@@ -136,16 +78,18 @@ langToggle.addEventListener('click', () => {
   setLanguage(current === 'zh' ? 'en' : 'zh');
 });
 
-const savedLang = localStorage.getItem('lang');
-if (savedLang) {
-  setLanguage(savedLang);
-}
+try { setLanguage(localStorage.getItem('lang')); } catch { /* Use the page's default language. */ }
 
 // ===== Publication Filters =====
 pubFilters.forEach(btn => {
+  btn.setAttribute('aria-pressed', btn.classList.contains('active'));
   btn.addEventListener('click', () => {
-    pubFilters.forEach(b => b.classList.remove('active'));
+    pubFilters.forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
 
     const filter = btn.getAttribute('data-filter');
     const items = document.querySelectorAll('.pub-item');
@@ -184,7 +128,37 @@ animateElements.forEach(el => observer.observe(el));
 
 // ===== Back to Top =====
 backToTop.addEventListener('click', () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+});
+
+// ===== Conceptual research illustrations (not empirical data) =====
+document.querySelectorAll('.selected-art').forEach(art => {
+  const svg = art.querySelector('svg');
+  function mark(tag, attributes) {
+    const element = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+    svg.appendChild(element);
+  }
+  if (art.dataset.art === 'vegetation') {
+    for (let x = 0; x < 21; x++) for (let y = 0; y < 9; y++) {
+      const density = (Math.sin(x * .65 + y * .8) + 1) / 2;
+      mark('rect', { x: 25 + x * 13, y: 19 + y * 13, width: 9, height: 9, fill: 'currentColor', opacity: .12 + density * .65 });
+    }
+  } else if (art.dataset.art === 'network') {
+    const points = Array.from({ length: 24 }, (_, i) => [24 + (i * 67) % 272, 20 + (i * i * 19) % 110]);
+    points.forEach(([x, y], i) => {
+      points.slice(i + 1).forEach(([x2, y2]) => {
+        if (Math.hypot(x - x2, y - y2) < 75) mark('line', { x1: x, y1: y, x2, y2, stroke: 'currentColor', opacity: .22 });
+      });
+      mark('circle', { cx: x, cy: y, r: i % 5 === 0 ? 4 : 2, fill: 'currentColor', opacity: .8 });
+    });
+  } else {
+    for (let row = 0; row < 12; row++) {
+      let d = '';
+      for (let x = 0; x <= 320; x += 4) d += `${x ? 'L' : 'M'}${x},${22 + row * 9 + Math.sin(x / 45 + row * .2) * 16}`;
+      mark('path', { d, stroke: 'currentColor', fill: 'none', 'stroke-width': 1.2, opacity: .2 + row * .05 });
+    }
+  }
 });
 
 // ===== Hero 视觉：社会-生态系统网络 =====
@@ -193,19 +167,20 @@ backToTop.addEventListener('click', () => {
   if (!sesCanvas) return;
 
   const sctx = sesCanvas.getContext('2d');
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let reduceMotion = motionPreference.matches;
 
-  const CYAN = [34, 211, 238];
-  const VIOLET = [167, 139, 250];
+  const CYAN = [125, 224, 194];
+  const VIOLET = [222, 202, 150];
   const rgba = (c, a) => `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${a})`;
 
   const PRIMARY = [
-    { lines: ['Ecosystem', 'Services'], color: CYAN },
-    { lines: ['AI for Science'], color: VIOLET },
-    { lines: ['Sustainability'], color: CYAN },
-    { lines: ['Social-', 'Ecological'], color: VIOLET },
+    { lines: ['Ecosystem', 'Services'], zh: ['生态系统服务'], color: CYAN },
+    { lines: ['AI for Science'], zh: ['AI for Science'], color: VIOLET },
+    { lines: ['Sustainability'], zh: ['可持续发展'], color: CYAN },
+    { lines: ['Social–Ecological', 'Systems'], zh: ['社会—生态系统'], color: VIOLET },
   ];
-  const SECONDARY_COUNT = 12;
+  const SECONDARY_COUNT = 28;
 
   let W = 0, H = 0, dpr = 1;
   let nodes = [];
@@ -236,6 +211,7 @@ backToTop.addEventListener('click', () => {
       nodes.push({
         primary: true,
         lines: p.lines,
+        zh: p.zh,
         color: p.color,
         r: 5,
         x: cx + Math.cos(a) * 60,
@@ -350,6 +326,20 @@ backToTop.addEventListener('click', () => {
     sctx.clearRect(0, 0, W, H);
     const active = hovered();
 
+    // Quiet orbital structure frames the conceptual network.
+    const orbit = Math.min(W, H) * .39;
+    sctx.strokeStyle = rgba(CYAN, .17);
+    sctx.lineWidth = .8;
+    sctx.beginPath();
+    sctx.arc(W / 2, H / 2, orbit, 0, Math.PI * 2);
+    sctx.stroke();
+    sctx.beginPath();
+    sctx.ellipse(W / 2, H / 2, orbit, orbit * .36, -.5, 0, Math.PI * 2);
+    sctx.stroke();
+    sctx.beginPath();
+    sctx.ellipse(W / 2, H / 2, orbit * .5, orbit, -.5, 0, Math.PI * 2);
+    sctx.stroke();
+
     // 连线
     for (const l of links) {
       const a = nodes[l.a], b = nodes[l.b];
@@ -407,15 +397,16 @@ backToTop.addEventListener('click', () => {
     // 标签
     sctx.textAlign = 'center';
     sctx.textBaseline = 'top';
-    sctx.font = '500 10px Inter, system-ui, sans-serif';
+    sctx.font = '400 12px Inter, system-ui, sans-serif';
     if ('letterSpacing' in sctx) sctx.letterSpacing = '0.04em';
     for (let i = 0; i < nodes.length; i++) {
       const n = nodes[i];
       if (!n.primary) continue;
       const lit = i === active;
-      sctx.fillStyle = lit ? rgba(n.color, 1) : 'rgba(148, 163, 184, 0.85)';
-      n.lines.forEach((line, k) => {
-        sctx.fillText(line, n.x, n.y + n.r + 10 + k * 12);
+      sctx.fillStyle = lit ? rgba(n.color, 1) : 'rgba(168, 191, 193, 0.95)';
+      const labels = document.documentElement.dataset.lang === 'en' ? n.lines : n.zh;
+      labels.forEach((line, k) => {
+        sctx.fillText(line, n.x, n.y + n.r + 10 + k * 15);
       });
     }
     if ('letterSpacing' in sctx) sctx.letterSpacing = '0px';
@@ -442,7 +433,7 @@ backToTop.addEventListener('click', () => {
     rafId = null;
   }
 
-  // 画布在窄屏被隐藏（宽度为 0），此时不初始化，等窗口变宽再试
+  // Resize from the displayed canvas, including on narrow screens.
   function init() {
     if (!resize()) { ready = false; return false; }
     build();
@@ -453,6 +444,13 @@ backToTop.addEventListener('click', () => {
   }
 
   init();
+  document.addEventListener('languagechange', () => { if (ready) draw(false); });
+  motionPreference.addEventListener('change', (event) => {
+    reduceMotion = event.matches;
+    stop();
+    if (ready) draw(false);
+    start();
+  });
 
   sesCanvas.addEventListener('pointermove', (e) => {
     const rect = sesCanvas.getBoundingClientRect();
