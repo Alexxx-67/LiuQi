@@ -3,6 +3,7 @@ const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('navMenu');
 const langToggle = document.getElementById('langToggle');
+const themeToggle = document.getElementById('themeToggle');
 const backToTop = document.getElementById('backToTop');
 const navLinks = document.querySelectorAll('.nav-link');
 const pubFilters = document.querySelectorAll('.pub-filter');
@@ -62,6 +63,28 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
+// ===== Light / Night =====
+function updateThemeButton() {
+  const isLight = document.documentElement.dataset.theme === 'light';
+  const isEnglish = document.documentElement.dataset.lang === 'en';
+  themeToggle.textContent = isLight ? 'Night' : 'Light';
+  const label = isEnglish
+    ? (isLight ? 'Switch to night mode' : 'Switch to light mode')
+    : (isLight ? '切换深色模式' : '切换浅色模式');
+  themeToggle.setAttribute('aria-label', label);
+  themeToggle.title = label;
+}
+
+themeToggle.addEventListener('click', () => {
+  const theme = document.documentElement.dataset.theme === 'light' ? 'night' : 'light';
+  document.documentElement.dataset.theme = theme;
+  document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f7f8f4' : '#0c1b22';
+  try { localStorage.setItem('theme', theme); } catch { /* The theme still works for this visit. */ }
+  updateThemeButton();
+  document.dispatchEvent(new Event('themechange'));
+});
+updateThemeButton();
+
 // ===== Language Toggle =====
 function setLanguage(lang) {
   if (lang !== 'zh' && lang !== 'en') return;
@@ -70,6 +93,7 @@ function setLanguage(lang) {
   try { localStorage.setItem('lang', lang); } catch { /* Browsing can continue without storage. */ }
   document.title = lang === 'zh' ? '刘齐 | 学术主页' : 'Qi Liu | Academic Homepage';
   hamburger.setAttribute('aria-label', lang === 'zh' ? '菜单' : 'Menu');
+  updateThemeButton();
   document.dispatchEvent(new Event('languagechange'));
 }
 
@@ -170,8 +194,16 @@ document.querySelectorAll('.selected-art').forEach(art => {
   const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
   let reduceMotion = motionPreference.matches;
 
-  const CYAN = [125, 224, 194];
-  const VIOLET = [222, 202, 150];
+  const CYAN = [];
+  const VIOLET = [];
+  let labelColor;
+  function updatePalette() {
+    const style = getComputedStyle(document.documentElement);
+    CYAN.splice(0, 3, ...style.getPropertyValue('--network-primary').split(',').map(Number));
+    VIOLET.splice(0, 3, ...style.getPropertyValue('--network-secondary').split(',').map(Number));
+    labelColor = style.getPropertyValue('--muted').trim();
+  }
+  updatePalette();
   const rgba = (c, a) => `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${a})`;
 
   const PRIMARY = [
@@ -403,7 +435,7 @@ document.querySelectorAll('.selected-art').forEach(art => {
       const n = nodes[i];
       if (!n.primary) continue;
       const lit = i === active;
-      sctx.fillStyle = lit ? rgba(n.color, 1) : 'rgba(168, 191, 193, 0.95)';
+      sctx.fillStyle = lit ? rgba(n.color, 1) : labelColor;
       const labels = document.documentElement.dataset.lang === 'en' ? n.lines : n.zh;
       labels.forEach((line, k) => {
         sctx.fillText(line, n.x, n.y + n.r + 10 + k * 15);
@@ -445,6 +477,10 @@ document.querySelectorAll('.selected-art').forEach(art => {
 
   init();
   document.addEventListener('languagechange', () => { if (ready) draw(false); });
+  document.addEventListener('themechange', () => {
+    updatePalette();
+    if (ready) draw(false);
+  });
   motionPreference.addEventListener('change', (event) => {
     reduceMotion = event.matches;
     stop();
