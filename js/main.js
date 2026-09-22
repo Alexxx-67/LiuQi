@@ -78,7 +78,7 @@ function updateThemeButton() {
 themeToggle.addEventListener('click', () => {
   const theme = document.documentElement.dataset.theme === 'light' ? 'night' : 'light';
   document.documentElement.dataset.theme = theme;
-  document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f7f8f4' : '#0c1b22';
+  document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f6f9ff' : '#0b1629';
   try { localStorage.setItem('theme', theme); } catch { /* The theme still works for this visit. */ }
   updateThemeButton();
   document.dispatchEvent(new Event('themechange'));
